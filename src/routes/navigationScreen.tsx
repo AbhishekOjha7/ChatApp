@@ -7,6 +7,8 @@ import SignIn from '../screens/onboardingScreen/sign';
 import ProfileScreen from '../screens/profileScreen/profile';
 import OtpScreen from '../screens/onboardingScreen/otpScreen';
 import MessageScreen from '../screens/chat/messageScreen';
+import HomeScreen from '../screens/homeScreens';
+
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
@@ -18,6 +20,7 @@ const NavigationScreen = () => {
         <Stack.Screen name="SignIn" component={SignIn} />
         <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="MessageScreen" component={MessageScreen} />
       </Stack.Navigator>
     </NavigationContainer>
