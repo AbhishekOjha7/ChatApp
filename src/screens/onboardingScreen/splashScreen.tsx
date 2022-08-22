@@ -27,7 +27,7 @@ export default function SplashScreen(props: USERDEFINED) {
     setTimeout(() => {
       if (uid) {
         setisLoading(true);
-        navigation.navigate('MessageScreen');
+        navigation.navigate('HomeScreen');
       } else {
         navigation.replace('SignIn');
       }

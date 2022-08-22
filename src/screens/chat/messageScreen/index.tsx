@@ -1,57 +1,72 @@
-import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-const MessageScreen = () => {
-  const [Name, setUserName] = useState<any>([]);
-  const [about, setAbout] = useState<any>([]);
-  const navigation = useNavigation<any>();
-  //   console.log('jfbgj', Name);\\
-  let UserData = [];
+// import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+// import React, {useEffect, useState} from 'react';
+// import firestore from '@react-native-firebase/firestore';
+// import {useNavigation} from '@react-navigation/native';
+// import TopTabNav from '../../../routes/toptabNav';
+// const MessageScreen = () => {
+//   const [Name, setUserName] = useState<any>([]);
+//   const [about, setAbout] = useState<any>([]);
+//   const navigation = useNavigation<any>();
+//   //   console.log('jfbgj', Name);\\
+//   let UserData = [];
 
-  useEffect(() => {
-    firestore()
-      .collection('Users')
-      .get()
-      .then(querySnapshot => {
-        // console.log('Total users: ', querySnapshot.size);
-        querySnapshot.forEach(documentSnapshot => {
-          const UserName = documentSnapshot.data();
-          setUserName((p: any) => [...p, UserName]);
-          console.log('User Name:=====> ', UserName);
-        });
-      });
-  }, []);
-  const _renderItem = ({item}: any) => {
-    console.log('bjd===>', item);
-    return (
-      <View>
-        <Text style={{color: 'white'}}>{item.Name}</Text>
-      </View>
-    );
-  };
+//   useEffect(() => {
+//     firestore()
+//       .collection('Users')
+//       .get()
+//       .then(querySnapshot => {
+//         // console.log('Total users: ', querySnapshot.size);
+//         querySnapshot.forEach(documentSnapshot => {
+//           const UserName = documentSnapshot.data();
+//           setUserName((p: any) => [...p, UserName]);
+//           console.log('User Name:=====> ', UserName);
+//         });
+//       });
+//   }, []);
+//   const _renderItem = ({item}: any) => {
+//     console.log('bjd===>', item);
+//     return (
+//       <View>
+//         <Text style={{color:'white'}}>{item.Name}</Text>
+//       </View>
+//     );
+//   };
+//   return (
+//     <SafeAreaView style={{flex:1,backgroundColor:'black'}}>
+//       <Text onPress={() => navigation.navigate('ProfileScreen')}>
+//         Go for Logout
+//       </Text>
+//       <View>
+//        <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
+//       </View>
+//       <TopTabNav/>
+//       <FlatList
+//         data={Name}
+//         //@ts-ignore
+//         renderItem={_renderItem}
+//       />
+//     </SafeAreaView>
+//   );
+// };
+
+// export default MessageScreen;
+
+// const styles = StyleSheet.create({
+
+//   whtsptxt:{
+//     color:'white',
+//     fontSize:22
+//   }
+// });
+import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+
+export default function MessageScreen() {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
-      <Text onPress={() => navigation.navigate('ProfileScreen')}>
-        Go for Logout
-      </Text>
-      <View>
-        <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
-      </View>
-      <FlatList
-        data={Name}
-        //@ts-ignore
-        renderItem={_renderItem}
-      />
-    </SafeAreaView>
+    <View>
+      <Text>index</Text>
+    </View>
   );
-};
+}
 
-export default MessageScreen;
-
-const styles = StyleSheet.create({
-  whtsptxt: {
-    color: 'white',
-    fontSize: 22,
-  },
-});
+const styles = StyleSheet.create({});
