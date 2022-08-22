@@ -9,4 +9,6 @@ export const images={
     logout:require('../assets/images/power.png'),
     update:require('../assets/images/updated.png'),
     account:require('../assets/images/account.png'),
+    search:require('../assets/images/search.png'),
+    dot:require('../assets/images/dots.png'),
 }

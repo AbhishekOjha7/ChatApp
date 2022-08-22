@@ -51,11 +51,12 @@ export default function ProfileScreen() {
         Name: name,
         Email: Email,
         About: About,
+        display: coverimg,
       })
       .then(res => {
         console.log('Response is', res);
         dispatch({type: 'Set_Data', payload: res});
-        navigation.navigate('MessageScreen');
+        navigation.navigate('HomeScreen');
       })
       .catch(err => {
         console.log('Error is', err);
@@ -105,21 +106,12 @@ export default function ProfileScreen() {
         <Image style={styles.rectangleimg} source={{uri: coverimg}} />
       </TouchableOpacity>
       <View style={styles.line}></View>
-      <View style={{marginTop: 20}}>
+      <View style={styles.textinputview}>
         <TextInput
           placeholder="Name"
           value={name}
           placeholderTextColor="white"
-          style={{
-            marginHorizontal: 20,
-            padding: 10,
-            borderWidth: 1,
-            marginVertical: normalize(20),
-            color: 'white',
-            borderRadius: 20,
-            height: normalize(45),
-            backgroundColor: '#141414',
-          }}
+          style={styles.inputinner}
           onChangeText={onChangeName}
         />
 
@@ -128,42 +120,20 @@ export default function ProfileScreen() {
           value={About}
           placeholderTextColor="white"
           onChangeText={onChangeAbout}
-          style={{
-            marginHorizontal: 20,
-            padding: 10,
-            borderWidth: 1,
-            marginVertical: normalize(20),
-            // borderColor: COLOR.WHITE,
-            color: 'white',
-            borderRadius: 20,
-            height: normalize(45),
-            backgroundColor: '#141414',
-          }}
+          style={styles.inputinner}
         />
         <TextInput
           placeholder="Email"
           placeholderTextColor="white"
           value={Email}
           onChangeText={onChangeEmail}
-          style={{
-            marginHorizontal: 20,
-            padding: 10,
-            borderWidth: 1,
-            marginVertical: normalize(20),
-            backgroundColor: '#141414',
-            color: 'white',
-            borderRadius: 20,
-            height: normalize(45),
-          }}
+          style={styles.inputinner}
         />
       </View>
 
       <TouchableOpacity onPress={UpdateDetails} style={styles.updateview}>
         <Image style={styles.updateimg} source={images.update} />
       </TouchableOpacity>
-      {/* <TouchableOpacity onPress={Logout}>
-        <Text style={{fontSize: 22,color:COLOR.WHITE}}>{'LogOut'}</Text>
-      </TouchableOpacity> */}
     </SafeAreaView>
   );
 }
@@ -220,5 +190,18 @@ const styles = StyleSheet.create({
   },
   updateview: {
     alignSelf: 'center',
+  },
+  textinputview: {
+    marginTop: 20,
+  },
+  inputinner: {
+    marginHorizontal: 20,
+    padding: 10,
+    borderWidth: 1,
+    marginVertical: normalize(20),
+    color: 'white',
+    borderRadius: 20,
+    height: normalize(45),
+    backgroundColor: '#141414',
   },
 });

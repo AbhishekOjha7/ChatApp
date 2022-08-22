@@ -1,50 +1,33 @@
-import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import firestore from '@react-native-firebase/firestore';
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import TopTabNav from '../../routes/toptabNav';
+import {normalize} from '../../utils/dimensions';
+import {images} from '../../utils/images';
 const HomeScreen = () => {
-  const [Name, setUserName] = useState<any>([]);
-  const [about, setAbout] = useState<any>([]);
   const navigation = useNavigation<any>();
-  //   console.log('jfbgj', Name);\\
-  let UserData = [];
-
-  useEffect(() => {
-    firestore()
-      .collection('Users')
-      .get()
-      .then(querySnapshot => {
-        // console.log('Total users: ', querySnapshot.size);
-        querySnapshot.forEach(documentSnapshot => {
-          const UserName = documentSnapshot.data();
-          setUserName((p: any) => [...p, UserName]);
-          console.log('User Name:=====> ', UserName);
-        });
-      });
-  }, []);
-  const _renderItem = ({item}: any) => {
-    console.log('bjd===>', item);
-    return (
-      <View>
-        <Text style={{color:'white'}}>{item.Name}</Text>
-      </View>
-    );
-  };
   return (
-    <SafeAreaView style={{flex:1,backgroundColor:'black'}}>
-      <Text onPress={() => navigation.navigate('ProfileScreen')}>
-        Go for Logout
-      </Text>
-      <View>
-       <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
+    <SafeAreaView style={styles.parent}>
+      <View style={styles.body}>
+        <Text style={styles.headerText}>{'WhatsUp'}</Text>
+        <TouchableOpacity style={styles.searchImgTouchable}>
+          <Image source={images.search} style={styles.searchImg} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuTouchable}
+          onPress={() => navigation.navigate('ProfileScreen')}>
+          <Image style={styles.threeDotImg} source={images.dot} />
+        </TouchableOpacity>
       </View>
-      <TopTabNav/>
-      <FlatList
-        data={Name}
-        //@ts-ignore
-        renderItem={_renderItem}
-      />
+      <TopTabNav />
     </SafeAreaView>
   );
 };
@@ -52,9 +35,49 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-
-  whtsptxt:{
-    color:'white',
-    fontSize:22
-  }
+  parent: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  whtsptxt: {
+    color: 'white',
+    fontSize: 22,
+  },
+  body: {
+    flexDirection: 'row',
+    marginLeft: normalize(15),
+    marginBottom: normalize(10),
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: 'white',
+    marginTop: normalize(10),
+  },
+  searchImg: {
+    height: normalize(25),
+    width: normalize(25),
+    resizeMode: 'contain',
+  },
+  searchImgTouchable: {
+    marginLeft: normalize(190),
+    borderColor: '#2f3d29',
+    borderWidth: 2,
+    borderRadius: normalize(10),
+    backgroundColor: '#2f3d29',
+    padding:normalize(3)
+  },
+  threeDotImg: {
+    height: normalize(25),
+    width: normalize(25),
+    resizeMode: 'contain',
+  },
+  menuTouchable: {
+    marginLeft: normalize(15),
+    borderColor: '#2f3d29',
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: '#2f3d29',
+    padding:normalize(2)
+  },
 });
