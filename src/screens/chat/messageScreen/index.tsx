@@ -26,17 +26,17 @@ const MessageScreen = () => {
     console.log('bjd===>', item);
     return (
       <View>
-        <Text style={{color:'white'}}>{item.Name}</Text>
+        <Text style={{color: 'white'}}>{item.Name}</Text>
       </View>
     );
   };
   return (
-    <SafeAreaView style={{flex:1,backgroundColor:'black'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
       <Text onPress={() => navigation.navigate('ProfileScreen')}>
         Go for Logout
       </Text>
       <View>
-       <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
+        <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
       </View>
       <FlatList
         data={Name}
@@ -50,9 +50,8 @@ const MessageScreen = () => {
 export default MessageScreen;
 
 const styles = StyleSheet.create({
-
-  whtsptxt:{
-    color:'white',
-    fontSize:22
-  }
+  whtsptxt: {
+    color: 'white',
+    fontSize: 22,
+  },
 });
