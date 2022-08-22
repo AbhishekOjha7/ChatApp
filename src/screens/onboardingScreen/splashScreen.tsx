@@ -46,7 +46,7 @@ export default function SplashScreen(props: USERDEFINED) {
         label={'Continue'}
         styleview={styles.continue}
       />
-        {isLoading ? (
+      {isLoading ? (
         <ActivityIndicator
           size={'large'}
           color={COLOR.green}

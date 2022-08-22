@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {images} from '../../utils/images';
-import {normalize} from '../../utils/dimensions';
+import {normalize, vh, vw} from '../../utils/dimensions';
 import CustomButton from '../../components/customButton';
 import {COLOR} from '../../utils/color';
 import CustomTextinput from '../../components/customTextinput';
@@ -22,7 +22,6 @@ import auth from '@react-native-firebase/auth';
 export default function SignIn() {
   const navigation = useNavigation<any>();
   const [checked, setChecked] = useState<boolean>(false);
-  const [confirm, setConfirm] = useState(null);
   const [phoneno, setPhoneno] = useState<any>('');
   const [isLoading, setisLoading] = useState(false);
   const onPressCheck = () => {
@@ -30,16 +29,14 @@ export default function SignIn() {
   };
 
   const signInWithMobileNumber = async () => {
-    try{
-    setisLoading(true);
-    const confirmation = await auth().signInWithPhoneNumber(phoneno)
-    navigation.navigate('OtpScreen',{phoneno,confirm:confirmation})
-  }
-  catch(err){
-    console.log('err',err)
-  }
-}
-  
+    try {
+      setisLoading(true);
+      const confirmation = await auth().signInWithPhoneNumber(phoneno);
+      navigation.navigate('OtpScreen', {phoneno, confirm: confirmation});
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
 
   const navigateSignin = () => {
     navigation.navigate('SignIn');
@@ -47,11 +44,9 @@ export default function SignIn() {
   return (
     <KeyboardAwareScrollView style={styles.parent}>
       <StatusBar barStyle={'light-content'} translucent={true} />
-      <View style={{alignSelf: 'center', marginTop: 180}}>
-        <Image style={styles.whtsplogo} source={images.whtsplogo} />
-        <Text style={styles.whtsuptxt}>{'WhatsUp'}</Text>
+      <View style={styles.logoview}>
+        <Image style={styles.logo} source={images.logo} />
       </View>
-
       <View style={styles.signtxt}>
         <Text style={styles.headtxt}>{'Sign to your account'}</Text>
       </View>
@@ -98,11 +93,7 @@ export default function SignIn() {
 const styles = StyleSheet.create({
   parent: {
     flex: 1,
-    backgroundColor: 'black',
-  },
-  splshimg: {
-    width: normalize(375),
-    height: normalize(812),
+    backgroundColor: '#0d0d0d',
   },
   headtxt: {
     color: COLOR.WHITE,
@@ -114,29 +105,13 @@ const styles = StyleSheet.create({
   signtxt: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: normalize(80),
-  },
-  whtsuptxt: {
-    color: COLOR.green,
-    fontSize: 35,
-    fontWeight: '500',
-    marginTop: 10,
-  },
-  whtsplogo: {
-    height: normalize(130),
-    width: normalize(130),
-    borderRadius: 30,
-  },
-  checkBox: {
-    marginLeft: normalize(22),
-    marginTop: normalize(10),
-    backgroundColor: 'red',
   },
   customButtonStyle: {
     backgroundColor: COLOR.green,
+    marginTop: 25,
   },
   phonenoview: {
-    marginTop: 80,
+    marginTop: 20,
   },
   phonetxt: {
     color: 'white',
@@ -184,5 +159,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: normalize(180),
     top: normalize(380),
+  },
+  logoview: {
+    marginTop: 120,
+  },
+
+  logo: {
+    height: vh(400),
+    width: vw(375),
+    opacity: 1.5,
   },
 });

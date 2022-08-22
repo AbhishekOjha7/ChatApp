@@ -14,7 +14,7 @@ export default function CustomTextinput(props:any) {
     {...props}
     placeholder='Phone Number'
     placeholderTextColor={'grey'}
-    style={{color:'white',marginLeft:8}}
+    style={{color:'white',marginLeft:8,opacity:2,fontSize:18}}
     keyboardType='numeric'
 
     onChangeText={onChangeText}

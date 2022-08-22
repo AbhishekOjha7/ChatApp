@@ -7,7 +7,7 @@ const MessageScreen = () => {
   const [about, setAbout] = useState<any>([]);
   const navigation = useNavigation<any>();
   //   console.log('jfbgj', Name);\\
-  let UserData=[]
+  let UserData = [];
 
   useEffect(() => {
     firestore()
@@ -17,7 +17,7 @@ const MessageScreen = () => {
         // console.log('Total users: ', querySnapshot.size);
         querySnapshot.forEach(documentSnapshot => {
           const UserName = documentSnapshot.data();
-             setUserName((p:any)=>[...p,UserName]);
+          setUserName((p: any) => [...p, UserName]);
           console.log('User Name:=====> ', UserName);
         });
       });
@@ -26,16 +26,18 @@ const MessageScreen = () => {
     console.log('bjd===>', item);
     return (
       <View>
-        <Text>{item.Name}</Text>
+        <Text style={{color:'white'}}>{item.Name}</Text>
       </View>
     );
   };
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1,backgroundColor:'black'}}>
       <Text onPress={() => navigation.navigate('ProfileScreen')}>
         Go for Logout
       </Text>
-
+      <View>
+       <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
+      </View>
       <FlatList
         data={Name}
         //@ts-ignore
@@ -47,4 +49,10 @@ const MessageScreen = () => {
 
 export default MessageScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+
+  whtsptxt:{
+    color:'white',
+    fontSize:22
+  }
+});

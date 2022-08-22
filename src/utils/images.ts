@@ -6,5 +6,7 @@ export const images={
     check:require('../assets/images/check.png'),
     back:require('../assets/images/back.png'),
     logo:require('../assets/images/Whatsapp.png'),
-
+    logout:require('../assets/images/power.png'),
+    update:require('../assets/images/updated.png'),
+    account:require('../assets/images/account.png'),
 }
