@@ -11,6 +11,6 @@ export const STRINGS = {
     SIGNUPSCREEN: 'SignUpScreen',
   },
   TEXT: {
-    WHATS_UP: 'WhatsUp',
+    WHATS_UP: 'WhatsApp',
   },
 };

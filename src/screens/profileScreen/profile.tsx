@@ -34,11 +34,11 @@ export default function ProfileScreen() {
       .signOut()
       .then((res: any) => {
         console.log('User signed out!', res), navigation.navigate('SignIn');
-
         dispatch({type: 'signIn', payload: {}});
       })
       .catch((err: any) => {
         console.log('err', err);
+        // navigation.navigate('SignIn');
       });
   };
 
@@ -55,7 +55,7 @@ export default function ProfileScreen() {
       .then(res => {
         console.log('Response is', res);
         dispatch({type: 'Set_Data', payload: res});
-        navigation.navigate('MessageScreen');
+        navigation.navigate('HomeChatScreen');
       })
       .catch(err => {
         console.log('Error is', err);

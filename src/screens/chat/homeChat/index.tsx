@@ -1,20 +1,24 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import {useDispatch} from 'react-redux';
 import {normalize} from '../../../utils/dimensions';
 import {STRINGS} from '../../../utils/strings';
 import {images} from '../../../utils/images';
+import TopTabNavigation from '../../../routes/toptabNav';
+import firestore from '@react-native-firebase/firestore';
 
 export default function HomeChatScreen() {
+  const [name, setUserName] = React.useState<any>([]);
   const navigation = useNavigation<any>();
   const dispatch = useDispatch<any>();
+
   const Logout = () => {
     auth()
       .signOut()
       .then((res: any) => {
-        console.log('User signed out', res), navigation.navigate('LogInScreen');
+        console.log('User signed out', res), navigation.navigate('SignIn');
         dispatch({type: 'users', payload: {}});
       })
       .catch((err: any) => {
@@ -26,13 +30,17 @@ export default function HomeChatScreen() {
       <View style={styles.body}>
         <Text style={styles.headerText}>{STRINGS.TEXT.WHATS_UP}</Text>
         <TouchableOpacity style={styles.searchImgTouchable}>
-          {/* <Image source={images.search} style={styles.searchImg} /> */}
+          <Image source={images.search} style={styles.searchImg} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuTouchable} onPress={Logout}>
-          {/* <Image style={styles.threeDotImg} source={images.threeDot} /> */}
+        <TouchableOpacity
+          style={styles.menuTouchable}
+          onPress={() => {
+            navigation.navigate('ProfileScreen');
+          }}>
+          <Image style={styles.threeDotImg} source={images.threeDot} />
         </TouchableOpacity>
       </View>
-      {/* <TopTabNavigation /> */}
+      <TopTabNavigation />
     </View>
   );
 }

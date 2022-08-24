@@ -6,8 +6,10 @@ import SplashScreen from '../screens/onboardingScreen/splashScreen';
 import SignIn from '../screens/onboardingScreen/sign';
 import ProfileScreen from '../screens/profileScreen/profile';
 import OtpScreen from '../screens/onboardingScreen/otpScreen';
-import MessageScreen from '../screens/chat/messageScreen';
 import HomeScreen from '../screens/homeScreens';
+import HomeChatScreen from '../screens/chat/homeChat';
+import MessageScreen from '../screens/chat/messageScreen';
+import PersonalChat from '../screens/chat/homeChat/personalChat';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,7 +23,9 @@ const NavigationScreen = () => {
         <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="HomeChatScreen" component={HomeChatScreen} />
         <Stack.Screen name="MessageScreen" component={MessageScreen} />
+        <Stack.Screen name="PersonalChat" component={PersonalChat} />
       </Stack.Navigator>
     </NavigationContainer>
   );

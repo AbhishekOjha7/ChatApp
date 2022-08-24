@@ -27,19 +27,19 @@ const HomeScreen = () => {
     console.log('bjd===>', item);
     return (
       <View>
-        <Text style={{color:'white'}}>{item.Name}</Text>
+        <Text style={{color: 'white'}}>{item.Name}</Text>
       </View>
     );
   };
   return (
-    <SafeAreaView style={{flex:1,backgroundColor:'black'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
       <Text onPress={() => navigation.navigate('ProfileScreen')}>
         Go for Logout
       </Text>
       <View>
-       <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
+        <Text style={styles.whtsptxt}>{'WhatsUp'}</Text>
       </View>
-      <TopTabNav/>
+      <TopTabNav />
       <FlatList
         data={Name}
         //@ts-ignore
@@ -52,9 +52,8 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-
-  whtsptxt:{
-    color:'white',
-    fontSize:22
-  }
+  whtsptxt: {
+    color: 'white',
+    fontSize: 22,
+  },
 });
