@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
   parent: {
     flex: 1,
     backgroundColor: 'black',
+    paddingTop:80
   },
   whtsptxt: {
     color: 'white',

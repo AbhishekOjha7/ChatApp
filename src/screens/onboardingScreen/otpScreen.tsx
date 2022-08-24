@@ -34,6 +34,7 @@ export default function OtpScreen({route}: {route: any}) {
   async function confirmCode() {
     try {
       let user=await confirm.confirm(otp);
+      
       dispatch({type:'signIn',payload:{user}})
       navigation.navigate('ProfileScreen')
       console.log('user',user)

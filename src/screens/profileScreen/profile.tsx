@@ -9,7 +9,7 @@ import {
   ImageBackground,
   Dimensions,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useSelector, useDispatch} from 'react-redux';
@@ -23,11 +23,16 @@ export default function ProfileScreen() {
   //   const usersCollectionRef = firestore().collection('Users');
   const dispatch = useDispatch();
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
-  const [name, setName] = useState('');
-  const [About, setAbout] = useState('');
-  const [Email, setEmail] = useState('');
+
+  const [name, setName] = useState<any>('');
+  const [About, setAbout] = useState<any>('');
+  const [Email, setEmail] = useState<any>('');
   const [coverimg, setCoverimg] = useState<any>();
   const navigation = useNavigation<any>();
+  // console.log('dddddd',name);
+  console.log('Adfcvfds',Auth_Data);
+  
+  
 
   const Logout = () => {
     auth()
@@ -42,6 +47,19 @@ export default function ProfileScreen() {
       });
   };
 
+  useEffect(() => {
+    firestore()
+      .collection('Users')
+      .get()
+      .then(querySnapshot => {
+        // console.log('Total users: ', querySnapshot.size);
+        querySnapshot.forEach(documentSnapshot => {
+          const UserName = documentSnapshot.data();
+          console.log('User Name========:=====> ', UserName);
+        });
+      });
+  }, []);
+
   const UpdateDetails = () => {
     let uid = Auth_Data?.user?.user?.uid;
     firestore()
@@ -52,6 +70,7 @@ export default function ProfileScreen() {
         Email: Email,
         About: About,
         display: coverimg,
+        uid: uid,
       })
       .then(res => {
         console.log('Response is', res);
@@ -134,6 +153,16 @@ export default function ProfileScreen() {
       <TouchableOpacity onPress={UpdateDetails} style={styles.updateview}>
         <Image style={styles.updateimg} source={images.update} />
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('HomeScreen')}
+        style={{
+          width: 50,
+          backgroundColor: 'skyblue',
+          alignSelf: 'center',
+          paddingLeft: 10,
+        }}>
+        <Text>{'Go To ChatScreen'}</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -149,6 +178,7 @@ const styles = StyleSheet.create({
   },
   headview: {
     flexDirection: 'row',
+    marginTop:60
   },
   profiletxt: {
     color: COLOR.WHITE,

@@ -11,4 +11,6 @@ export const images={
     account:require('../assets/images/account.png'),
     search:require('../assets/images/search.png'),
     dot:require('../assets/images/dots.png'),
+    video:require('../assets/images/video.png'),
+    telephone:require('../assets/images/telephone.png'),
 }

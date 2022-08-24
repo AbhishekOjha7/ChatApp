@@ -22,6 +22,8 @@ export default function SplashScreen(props: USERDEFINED) {
   const [isLoading, setisLoading] = useState(false);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let uid = Auth_Data?.user?.user?.uid;
+  console.log("main uid",uid);
+  
 
   useEffect(() => {
     setTimeout(() => {
