@@ -1,27 +1,17 @@
-import {
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
-import {
-  GiftedChat,
-  Bubble,
-  InputToolbar,
-  Composer,
-} from 'react-native-gifted-chat';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
 import {images} from '../../../utils/images';
 import {normalize} from '../../../utils/dimensions';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import {COLOR} from '../../../utils/color';
 export default function Chating({route}: {route: any}) {
   const navigation = useNavigation<any>();
-  const {Name, UID} = route.params;
+  const {Name, UID, pic,status} = route.params;
+  // console.log('sds',pic);
+
   const [messages, setMessages] = useState([]);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
@@ -44,6 +34,7 @@ export default function Chating({route}: {route: any}) {
       });
     return subscribe;
   }, []);
+ 
 
   const getAllmsg = async () => {
     const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
@@ -80,23 +71,32 @@ export default function Chating({route}: {route: any}) {
       .doc(mymsg._id)
       .set(mymsg);
   };
+  const renderSend = (props: any) => {
+    return (
+      <Send {...props}>
+        <View style={styles.viewsendiconimg}>
+          <Image source={images.sendIcon} style={styles.sendiconimg} />
+        </View>
+      </Send>
+    );
+  };
   return (
     <View style={styles.parent}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginTop: 70,
-        }}>
-        <View style={{flexDirection: 'row'}}>
+      <View style={styles.innerview}>
+        <View style={styles.namearrowview}>
           <TouchableOpacity
             onPress={() => {
               navigation.goBack();
             }}>
             <Image style={styles.backimg} source={images.back} />
           </TouchableOpacity>
+          <View style={{alignItems: 'center'}}>
+            <Image style={styles.userbackground} source={images.user} />
+            <Image style={styles.profimg} source={{uri: pic}} />
+          </View>
           <Text style={styles.mainView}>{Name}</Text>
         </View>
+  
 
         <View style={styles.leftview}>
           <TouchableOpacity style={styles.searchImgTouchable}>
@@ -109,7 +109,10 @@ export default function Chating({route}: {route: any}) {
             <Image style={styles.threeDotImg} source={images.dot} />
           </TouchableOpacity>
         </View>
+        
       </View>
+      {status ? <Text style={{color: 'white',marginLeft:85}}>{'Online'}</Text> : 
+       <Text style={{color: 'yellow',marginLeft:85}}>{'Ofline'}</Text>}
       <View style={styles.line}></View>
       <GiftedChat
         messages={messages}
@@ -131,14 +134,9 @@ export default function Chating({route}: {route: any}) {
           );
         }}
         renderInputToolbar={props => (
-          <InputToolbar
-            {...props}
-            containerStyle={{backgroundColor: 'black'}}
-            renderComposer={props1 => (
-              <Composer {...props1} textInputStyle={{color: 'white'}} />
-            )}
-          />
+          <InputToolbar {...props} containerStyle={styles.containview} />
         )}
+        renderSend={renderSend}
       />
     </View>
   );
@@ -148,6 +146,16 @@ const styles = StyleSheet.create({
   parent: {
     flex: 1,
     backgroundColor: 'black',
+  },
+  innerview: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: normalize(65),
+    alignItems: 'center',
+  },
+  namearrowview: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   backimg: {
     height: normalize(25),
@@ -191,7 +199,7 @@ const styles = StyleSheet.create({
   mainView: {
     color: 'white',
     left: normalize(15),
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   leftview: {
@@ -202,6 +210,38 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
     width: normalize(370),
     alignSelf: 'center',
-    marginTop: normalize(20),
+    marginTop: normalize(10),
+  },
+  viewsendiconimg: {
+    height: 30,
+    width: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendiconimg: {
+    height: '90%',
+    width: '90%',
+  },
+  containview: {
+    backgroundColor: 'white',
+    height: normalize(40),
+    marginHorizontal: normalize(15),
+    borderRadius: 22,
+    justifyContent: 'center',
+    shadowColor: '#000',
+  },
+  userbackground: {
+    height: normalize(40),
+    width: normalize(40),
+    left: normalize(10),
+    borderRadius: normalize(100),
+    resizeMode: 'cover',
+  },
+  profimg: {
+    height: normalize(40),
+    width: normalize(40),
+    left: normalize(10),
+    borderRadius: normalize(100),
+    position: 'absolute',
   },
 });

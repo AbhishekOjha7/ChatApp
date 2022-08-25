@@ -71,6 +71,7 @@ export default function ProfileScreen() {
         About: About,
         display: coverimg,
         uid: uid,
+        isActive : true
       })
       .then(res => {
         console.log('Response is', res);
@@ -121,7 +122,7 @@ export default function ProfileScreen() {
       <View style={styles.line}></View>
 
       <TouchableOpacity onPress={imageOpencover} style={styles.imgContainer}>
-        <Image style={styles.backgroundimg} source={images.account} />
+        <Image style={styles.backgroundimg} source={images.user} />
         <Image style={styles.rectangleimg} source={{uri: coverimg}} />
       </TouchableOpacity>
       <View style={styles.line}></View>

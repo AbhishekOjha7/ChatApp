@@ -13,4 +13,6 @@ export const images={
     dot:require('../assets/images/dots.png'),
     video:require('../assets/images/video.png'),
     telephone:require('../assets/images/telephone.png'),
+    sendIcon:require('../assets/images/send.png'),
+    user:require('../assets/images/user.png')
 }
