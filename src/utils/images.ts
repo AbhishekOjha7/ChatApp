@@ -14,5 +14,7 @@ export const images={
     video:require('../assets/images/video.png'),
     telephone:require('../assets/images/telephone.png'),
     sendIcon:require('../assets/images/send.png'),
-    user:require('../assets/images/user.png')
+    user:require('../assets/images/user.png'),
+    Bg:require('../assets/images/Bg.png'),
+    peakpx:require('../assets/images/peakpx.jpg')
 }

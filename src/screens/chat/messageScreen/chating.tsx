@@ -1,8 +1,8 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
 import {images} from '../../../utils/images';
-import {normalize} from '../../../utils/dimensions';
+import {normalize, vh} from '../../../utils/dimensions';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
@@ -10,11 +10,10 @@ import {COLOR} from '../../../utils/color';
 export default function Chating({route}: {route: any}) {
   const navigation = useNavigation<any>();
   const {Name, UID, pic,status} = route.params;
-  // console.log('sds',pic);
-
   const [messages, setMessages] = useState([]);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
+  const [userStatus, setuserStatus] = useState('')
   useEffect(() => {
     const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
     const subscribe = firestore()
@@ -35,7 +34,16 @@ export default function Chating({route}: {route: any}) {
     return subscribe;
   }, []);
  
-
+  useEffect(() => {
+    const subscribe = firestore()
+      .collection('Users')
+      .doc(UID)
+      .onSnapshot((documentSnapshot:any) => {
+        console.log(documentSnapshot.data().isActive);
+        setuserStatus(documentSnapshot.data().isActive);
+      });
+      return subscribe;
+    }, []);
   const getAllmsg = async () => {
     const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
     const querySanp = await firestore()
@@ -82,6 +90,8 @@ export default function Chating({route}: {route: any}) {
   };
   return (
     <View style={styles.parent}>
+      
+       
       <View style={styles.innerview}>
         <View style={styles.namearrowview}>
           <TouchableOpacity
@@ -111,10 +121,12 @@ export default function Chating({route}: {route: any}) {
         </View>
         
       </View>
-      {status ? <Text style={{color: 'white',marginLeft:85}}>{'Online'}</Text> : 
-       <Text style={{color: 'yellow',marginLeft:85}}>{'Ofline'}</Text>}
+      {userStatus ==='online'  ? <Text style={styles.onlinetxt}>{'Online'}</Text> : 
+       <Text style={styles.oflinetxt}>{'Ofline'}</Text>}
       <View style={styles.line}></View>
+      <ImageBackground style={{height:'85%',width:'100%'}} source={images.peakpx}>
       <GiftedChat
+      messagesContainerStyle={{height: vh(540),}}
         messages={messages}
         onSend={text => onSend(text)}
         showUserAvatar
@@ -128,7 +140,11 @@ export default function Chating({route}: {route: any}) {
               wrapperStyle={{
                 right: {
                   backgroundColor: COLOR.green,
+                  left:normalize(40)
                 },
+                left:{
+                  right:normalize(35)
+                }
               }}
             />
           );
@@ -138,7 +154,9 @@ export default function Chating({route}: {route: any}) {
         )}
         renderSend={renderSend}
       />
-    </View>
+      </ImageBackground>
+       
+     </View>
   );
 }
 
@@ -244,4 +262,10 @@ const styles = StyleSheet.create({
     borderRadius: normalize(100),
     position: 'absolute',
   },
+  onlinetxt:{
+    color: COLOR.green,marginLeft:normalize(85),fontSize:15
+  },
+  oflinetxt:{
+    color: COLOR.WHITE,marginLeft:normalize(85),fontSize:15
+  }
 });

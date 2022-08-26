@@ -1,5 +1,5 @@
 import {View, Text, AppState} from 'react-native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import SplashScreen from '../screens/onboardingScreen/splashScreen';
@@ -18,35 +18,61 @@ const NavigationScreen = () => {
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
   console.log('AUTHHHHHH', Auth_Data);
+const [userStatus, setUserStatus] = useState('')
+  // useEffect(() => {
+  //   AppState.addEventListener('change', _handleAppStateChange);
+
+  //   return () => {
+  //     AppState.removeEventListener('change', _handleAppStateChange);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
-    AppState.addEventListener('change', _handleAppStateChange);
-
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        firestore().collection('Users').doc(UserId).update({
+          isActive:'online'
+        })
+        
+        // status = true;
+      } else {
+        firestore().collection('Users').doc(UserId).update({
+          isActive:'offline'
+        })
+      }
+      appState.current = nextAppState;
+      setUserStatus(appState.current);
+      console.log('AppState', appState.current);
+    });
+  
     return () => {
-      AppState.removeEventListener('change', _handleAppStateChange);
+      subscription.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const _handleAppStateChange = (nextAppState: any) => {
-    console.log('AppState', appState.current);
-    if (
-      appState.current.match(/inactive|background/) &&
-      nextAppState === 'active'
-    ) {
-      // TODO SET USERS ONLINE STATUS TO TRUE
-      firestore().collection('Users').doc(UserId).update({
-        isActive: true,
-      });
-    } else {
-      // TODO SET USERS ONLINE STATUS
-      firestore().collection('Users').doc(UserId).update({
-        isActive: false,
-      });
-    }
+  // const _handleAppStateChange = (nextAppState: any) => {
+  //   console.log('AppState', appState.current);
+  //   if (
+  //     appState.current.match(/inactive|background/) &&
+  //     nextAppState === 'active'
+  //   ) {
+  //     // TODO SET USERS ONLINE STATUS TO TRUE
+  //     firestore().collection('Users').doc(UserId).update({
+  //       isActive: true,
+  //     });
+  //   } else {
+  //     // TODO SET USERS ONLINE STATUS
+  //     firestore().collection('Users').doc(UserId).update({
+  //       isActive: false,
+  //     });
+  //   }
 
-    appState.current = nextAppState;
-  };
+  //   appState.current = nextAppState;
+  // };
 
   return (
     <NavigationContainer>

@@ -11,55 +11,67 @@ import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import {normalize} from '../../../utils/dimensions';
 import {useDispatch, useSelector} from 'react-redux';
-import { TabBarItem } from 'react-native-tab-view';
 import SignIn from '../../onboardingScreen/sign';
-import { images } from '../../../utils/images';
-
+import {images} from '../../../utils/images';
 export default function MessageScreen() {
   const [Name, setUserName] = useState<any>([]);
   const navigation = useNavigation<any>();
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
-  const dispatch=useDispatch<any>();
-  
+  const dispatch = useDispatch<any>();
+  const [status, setStatus] = useState(false);
   useEffect(() => {
     firestore()
       .collection('Users')
-      .where('uid','!=',UserId)
+      .where('uid', '!=', UserId)
       .get()
       .then(res => {
-       //@ts-ignore
-          
-         console.log('result', res._docs);
-           //@ts-ignore
+        //@ts-ignore
+
+        console.log('result', res._docs);
+        //@ts-ignore
         let users = res?._docs?.map((item: any) => {
           return item._data;
         });
-      
+
         console.log('resss', users);
         setUserName(users);
       });
-    
   }, []);
- 
+
+  useEffect(() => {
+    const subscribe = firestore()
+      .collection('Users')
+      .doc(UserId)
+      .onSnapshot((documentSnapshot: any) => {
+        console.log('documentSnapshot', documentSnapshot.data().isActive);
+        setStatus(documentSnapshot.data().isActive);
+      });
+    return subscribe;
+  });
+
   const _renderItem = ({item}: any) => {
-    // console.log('SSSS', item);
-     console.log("other idddd",item?.isActive);
-  // console.log('fgdhjksl',item.display);
-  // dispatch({type:'SignIn',payload:item})
+    const {isActive} = item;
     return (
       <View>
-
-        <TouchableOpacity style={styles.flatlistview} onPress={()=>navigation.navigate('Chating',{Name:item?.Name,UID:item?.uid,pic:item?.display,status:item?.isActive})}>
-          <Image style={styles.backimgprofile} source={images.user}/>
+        <TouchableOpacity
+          style={styles.flatlistview}
+          onPress={() =>
+            navigation.navigate('Chating', {
+              Name: item?.Name,
+              UID: item?.uid,
+              pic: item?.display,
+              status: isActive,
+            })
+          }>
+          <Image style={styles.backimgprofile} source={images.user} />
           <Image source={{uri: item.display}} style={styles.img} />
           <TouchableOpacity>
             <Text style={styles.name}>{item?.Name}</Text>
           </TouchableOpacity>
         </TouchableOpacity>
-   <View style={styles.line}></View>
+        <View style={styles.line}></View>
       </View>
-
     );
   };
   return (
@@ -77,8 +89,7 @@ const styles = StyleSheet.create({
   flatlistview: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:10
-  
+    marginTop: 10,
   },
   img: {
     height: normalize(60),
@@ -89,8 +100,7 @@ const styles = StyleSheet.create({
   name: {
     color: 'white',
     margin: normalize(10),
-    fontWeight:'500',
-    
+    fontWeight: '500',
   },
   line: {
     borderWidth: 0.8,
@@ -99,10 +109,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: normalize(10),
   },
-  backimgprofile:{
+  backimgprofile: {
     height: normalize(60),
     width: normalize(60),
     borderRadius: normalize(100),
     resizeMode: 'cover',
-  }
+  },
 });

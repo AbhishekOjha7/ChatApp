@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   parent: {
     flex: 1,
     backgroundColor: 'black',
-    paddingTop:80
+    paddingTop:normalize(80)
   },
   whtsptxt: {
     color: 'white',
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: normalize(10),
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '700',
     color: 'white',
     marginTop: normalize(10),
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     marginLeft: normalize(15),
     borderColor: '#2f3d29',
     borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: normalize(10),
     backgroundColor: '#2f3d29',
     padding:normalize(2)
   },

@@ -71,7 +71,7 @@ export default function ProfileScreen() {
         About: About,
         display: coverimg,
         uid: uid,
-        isActive : true
+        // isActive : true
       })
       .then(res => {
         console.log('Response is', res);
@@ -109,7 +109,7 @@ export default function ProfileScreen() {
     }
   };
   return (
-    <SafeAreaView style={styles.parent}>
+    <View style={styles.parent}>
       <View style={styles.headview}>
         <TouchableOpacity onPress={NaviagteGoback}>
           <Image style={styles.backimg} source={images.back} />
@@ -164,7 +164,7 @@ export default function ProfileScreen() {
         }}>
         <Text>{'Go To ChatScreen'}</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
