@@ -1,5 +1,12 @@
-import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
 import {images} from '../../../utils/images';
 import {normalize, vh} from '../../../utils/dimensions';
@@ -7,13 +14,17 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import {COLOR} from '../../../utils/color';
+import Spinner from 'react-native-spinkit';
 export default function Chating({route}: {route: any}) {
   const navigation = useNavigation<any>();
-  const {Name, UID, pic,status} = route.params;
+  const {Name, UID, pic, status} = route.params;
+  const [isTyping, setisTyping] = useState<boolean>(false);
+  const [getTypingStatus, setgetTypingStatus] = useState(false);
   const [messages, setMessages] = useState([]);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
-  const [userStatus, setuserStatus] = useState('')
+  const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
+  const [userStatus, setuserStatus] = useState('');
   useEffect(() => {
     const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
     const subscribe = firestore()
@@ -33,17 +44,17 @@ export default function Chating({route}: {route: any}) {
       });
     return subscribe;
   }, []);
- 
+
   useEffect(() => {
     const subscribe = firestore()
       .collection('Users')
       .doc(UID)
-      .onSnapshot((documentSnapshot:any) => {
+      .onSnapshot((documentSnapshot: any) => {
         console.log(documentSnapshot.data().isActive);
         setuserStatus(documentSnapshot.data().isActive);
       });
-      return subscribe;
-    }, []);
+    return subscribe;
+  }, []);
   const getAllmsg = async () => {
     const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
     const querySanp = await firestore()
@@ -88,10 +99,63 @@ export default function Chating({route}: {route: any}) {
       </Send>
     );
   };
+
+  useEffect(() => {
+    firestore()
+      .collection('chatrooms')
+      .doc(docid)
+      .collection('TypingStatus')
+      .doc(UserId)
+      .set({
+        isTyping: isTyping,
+      });
+    firestore()
+      .collection('chatrooms')
+      .doc(docid)
+      .collection('TypingStatus')
+      .doc(UID)
+      .onSnapshot(onchange => {
+        let typing = onchange.data();
+        setgetTypingStatus(typing?.isTyping);
+      });
+  }, [isTyping]);
+
+  const debounce = useCallback((fun: any, timeout: any) => {
+    //@ts-ignore
+    let timer;
+    return (args: any) => {
+      //@ts-ignore
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fun(false);
+      }, timeout);
+      setisTyping(true);
+    };
+  }, []);
+
+  const startTyping = debounce(() => {
+    setisTyping(false);
+  }, 2000);
+
+  const findtyping = (text: any) => {
+    if (text.length > 0)
+      //@ts-ignore
+      startTyping();
+  };
+
+  const renderFooter = () => {
+    console.log('tfyhjbjm', getTypingStatus);
+if(getTypingStatus){
+  return (
+    <View style={{marginLeft:normalize(23)}}>
+<Spinner isVisible={true} type="ThreeBounce" size={60} color={'white'}/>
+    </View>   );
+}
+   
+ 
+  };
   return (
     <View style={styles.parent}>
-      
-       
       <View style={styles.innerview}>
         <View style={styles.namearrowview}>
           <TouchableOpacity
@@ -106,7 +170,6 @@ export default function Chating({route}: {route: any}) {
           </View>
           <Text style={styles.mainView}>{Name}</Text>
         </View>
-  
 
         <View style={styles.leftview}>
           <TouchableOpacity style={styles.searchImgTouchable}>
@@ -119,44 +182,48 @@ export default function Chating({route}: {route: any}) {
             <Image style={styles.threeDotImg} source={images.dot} />
           </TouchableOpacity>
         </View>
-        
       </View>
-      {userStatus ==='online'  ? <Text style={styles.onlinetxt}>{'Online'}</Text> : 
-       <Text style={styles.oflinetxt}>{'Ofline'}</Text>}
+      {userStatus === 'online' ? (
+        <Text style={styles.onlinetxt}>{'Online'}</Text>
+      ) : (
+        <Text style={styles.oflinetxt}>{'Ofline'}</Text>
+      )}
       <View style={styles.line}></View>
-      <ImageBackground style={{height:'85%',width:'100%'}} source={images.peakpx}>
-      <GiftedChat
-      messagesContainerStyle={{height: vh(540),}}
-        messages={messages}
-        onSend={text => onSend(text)}
-        showUserAvatar
-        user={{
-          _id: UserId,
-        }}
-        renderBubble={props => {
-          return (
-            <Bubble
-              {...props}
-              wrapperStyle={{
-                right: {
-                  backgroundColor: COLOR.green,
-                  left:normalize(40)
-                },
-                left:{
-                  right:normalize(35)
-                }
-              }}
-            />
-          );
-        }}
-        renderInputToolbar={props => (
-          <InputToolbar {...props} containerStyle={styles.containview} />
-        )}
-        renderSend={renderSend}
-      />
+      <ImageBackground style={styles.girlimg} source={images.peakpx}>
+        <GiftedChat
+          isTyping={getTypingStatus}
+          onInputTextChanged={findtyping}
+          messagesContainerStyle={{height: vh(540)}}
+          messages={messages}
+          onSend={text => onSend(text)}
+          showUserAvatar
+          user={{
+            _id: UserId,
+          }}
+          renderBubble={props => {
+            return (
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  right: {
+                    backgroundColor: COLOR.green,
+                    left: normalize(40),
+                  },
+                  left: {
+                    right: normalize(35),
+                  },
+                }}
+              />
+            );
+          }}
+          renderInputToolbar={props => (
+            <InputToolbar {...props} containerStyle={styles.containview} />
+          )}
+          renderSend={renderSend}
+          renderFooter={renderFooter}
+        />
       </ImageBackground>
-       
-     </View>
+    </View>
   );
 }
 
@@ -262,10 +329,18 @@ const styles = StyleSheet.create({
     borderRadius: normalize(100),
     position: 'absolute',
   },
-  onlinetxt:{
-    color: COLOR.green,marginLeft:normalize(85),fontSize:15
+  onlinetxt: {
+    color: COLOR.green,
+    marginLeft: normalize(85),
+    fontSize: 15,
   },
-  oflinetxt:{
-    color: COLOR.WHITE,marginLeft:normalize(85),fontSize:15
-  }
+  oflinetxt: {
+    color: COLOR.WHITE,
+    marginLeft: normalize(85),
+    fontSize: 15,
+  },
+  girlimg: {
+    height: '85%',
+    width: '100%',
+  },
 });

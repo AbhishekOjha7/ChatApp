@@ -29,6 +29,10 @@ const [userStatus, setUserStatus] = useState('')
   // }, []);
 
   useEffect(() => {
+    firestore().collection('Users').doc(UserId).update({
+      isActive:'online'
+    })
+    
     const subscription = AppState.addEventListener('change', nextAppState => {
       if (
         appState.current.match(/inactive|background/) &&
