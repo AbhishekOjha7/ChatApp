@@ -11,76 +11,77 @@ import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import {normalize} from '../../../utils/dimensions';
 import {useDispatch, useSelector} from 'react-redux';
-import SignIn from '../../onboardingScreen/sign';
 import {images} from '../../../utils/images';
 export default function MessageScreen() {
-  const [Name, setUserName] = useState<any>([]);
   const navigation = useNavigation<any>();
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
   const dispatch = useDispatch<any>();
-  const [status, setStatus] = useState(false);
+  const [data, setData] = useState<any>([]);
+  const [profile, setProfile] = useState<any>([]);
+  const [allUsers, setUsers] = useState();
+
   useEffect(() => {
     firestore()
       .collection('Users')
-      .where('uid', '!=', UserId)
-      .get()
-      .then(res => {
+      .onSnapshot(onchange => {
+        let allUsers = onchange.docs.map(item => {
+          return item.data();
+        });
         //@ts-ignore
+        setUsers(allUsers);
+      });
 
-        console.log('result', res._docs);
-        //@ts-ignore
-        let users = res?._docs?.map((item: any) => {
+    firestore()
+      .collection('Users')
+      .doc(UserId)
+      .collection('inbox')
+      .onSnapshot((documentSnapshot: any) => {
+        let users = documentSnapshot?._docs?.map((item: any) => {
           return item._data;
         });
-
-        console.log('resss', users);
-        setUserName(users);
+        setData(users);
       });
   }, []);
 
-  useEffect(() => {
-    const subscribe = firestore()
-      .collection('Users')
-      .doc(UserId)
-      .onSnapshot((documentSnapshot: any) => {
-        console.log('documentSnapshot', documentSnapshot.data().isActive);
-        setStatus(documentSnapshot.data().isActive);
-      });
-    return subscribe;
-  });
-
   const _renderItem = ({item}: any) => {
-    const {isActive} = item;
+    const {isActive, name, pic, display, uid} = item;
+
     return (
       <View>
         <TouchableOpacity
           style={styles.flatlistview}
           onPress={() =>
             navigation.navigate('Chating', {
-              Name: item?.Name,
-              UID: item?.uid,
-              pic: item?.display,
+              Name: name,
+              UID: uid,
+              pic: item.display,
               status: isActive,
             })
           }>
           <Image style={styles.backimgprofile} source={images.user} />
-          <Image source={{uri: item.display}} style={styles.img} />
+          <Image source={{uri: item?.display}} style={styles.img} />
           <TouchableOpacity>
-            <Text style={styles.name}>{item?.Name}</Text>
+            <Text style={styles.name}>{name}</Text>
           </TouchableOpacity>
         </TouchableOpacity>
         <View style={styles.line}></View>
       </View>
     );
   };
+  const NavigateAllcontact = () => {
+    navigation.navigate('AllContact');
+  };
   return (
-    <View>
+    <View style={{flex: 1}}>
       <FlatList
-        data={Name}
+        data={data}
         //@ts-ignore
         renderItem={_renderItem}
       />
+      <TouchableOpacity onPress={NavigateAllcontact} style={styles.contactview}>
+        <Image style={styles.contactimg} source={images.allcontacts} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -114,5 +115,13 @@ const styles = StyleSheet.create({
     width: normalize(60),
     borderRadius: normalize(100),
     resizeMode: 'cover',
+  },
+  contactview: {
+    justifyContent: 'flex-end',
+    left: normalize(300),
+  },
+  contactimg: {
+    height: normalize(60),
+    width: normalize(60),
   },
 });

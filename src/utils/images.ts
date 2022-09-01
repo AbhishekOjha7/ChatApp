@@ -16,5 +16,6 @@ export const images={
     sendIcon:require('../assets/images/send.png'),
     user:require('../assets/images/user.png'),
     Bg:require('../assets/images/Bg.png'),
-    peakpx:require('../assets/images/peakpx.jpg')
+    peakpx:require('../assets/images/peakpx.jpg'),
+    allcontacts:require('../assets/images/message.png')
 }

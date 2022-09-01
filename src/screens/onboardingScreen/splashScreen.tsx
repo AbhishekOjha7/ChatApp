@@ -21,10 +21,14 @@ export default function SplashScreen(props: USERDEFINED) {
   const navigation = useNavigation<any>();
   const [isLoading, setisLoading] = useState(false);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
-  let uid = Auth_Data?.user?.user?.uid;
-  console.log("main uid",uid);
+  // console.log("authhhhhhhh",Auth_Data);
   
-
+  let uid = Auth_Data?.user?.user?.uid;
+  // console.log("main uid",uid);
+  
+  const {User_Data} = useSelector((store: any) => store.chatReducer);
+  // console.log("userrr",User_Data);
+  
   useEffect(() => {
     setTimeout(() => {
       if (uid) {

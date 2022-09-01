@@ -5,42 +5,137 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Clipboard,
 } from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
-import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
+import React, {useCallback, useEffect, useId, useState} from 'react';
+import {
+  GiftedChat,
+  Bubble,
+  InputToolbar,
+  Send,
+  IMessage,
+} from 'react-native-gifted-chat';
 import {images} from '../../../utils/images';
-import {normalize, vh} from '../../../utils/dimensions';
+import {normalize, vh, vw} from '../../../utils/dimensions';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import {COLOR} from '../../../utils/color';
-import Spinner from 'react-native-spinkit';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 export default function Chating({route}: {route: any}) {
   const navigation = useNavigation<any>();
   const {Name, UID, pic, status} = route.params;
+  const [userStatus, setuserStatus] = useState('');
   const [isTyping, setisTyping] = useState<boolean>(false);
   const [getTypingStatus, setgetTypingStatus] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any>([]);
+  const [data, setData] = useState<any>([]);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
+  const {User_Data} = useSelector((store: any) => store.chatReducer);
+  let loginname = User_Data?.name;
   let UserId = Auth_Data?.user?.user?.uid;
   const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
-  const [userStatus, setuserStatus] = useState('');
+
+  const handleLongPress = (context: any, message: any) => {
+    let options, cancelButtonIndex;
+    if (UserId === message.fromUserID) {
+      options = ['Copy', 'Delete for me', 'Delete for everyone', 'cancel'];
+      cancelButtonIndex = options.length;
+      context.actionSheet().showActionSheetWithOptions(
+        {options, cancelButtonIndex},
+        //@ts-ignore
+        buttonIndex => {
+          switch (buttonIndex) {
+            case 0:
+              Clipboard.setString(message.text);
+              break;
+            case 1:
+              deletForMe(message, docid);
+              break;
+            case 2:
+              deletedForEveryOne(message, docid);
+              break;
+          }
+        },
+      );
+    } else {
+      options = ['Copy', 'Delete for me', 'cancel'];
+      cancelButtonIndex = options.length;
+      context.actionSheet().showActionSheetWithOptions(
+        {options, cancelButtonIndex},
+        //@ts-ignore
+        buttonIndex => {
+          switch (buttonIndex) {
+            case 0:
+              Clipboard.setString(message.text);
+              break;
+            case 1:
+              deletForMe(message, docid);
+              break;
+          }
+        },
+      );
+    }
+  };
+
+  const handleRead = async () => {
+    const validate = await firestore()
+      .collection('chatrooms')
+      .doc(docid)
+      .collection('messages')
+      .get();
+    const batch = firestore()?.batch();
+    validate.forEach((documentSnapshot: any) => {
+      if (documentSnapshot?._data.toUserID === UserId) {
+        batch.update(documentSnapshot.ref, {received: true});
+      }
+    });
+    return batch.commit();
+  };
+
+  const deletForMe = (message: any, docid: any) => {
+    firestore()
+      .collection('chatrooms')
+      .doc(docid)
+      .collection('messages')
+      .doc(message?._id)
+      .update({...message, deleatedBy: UserId})
+      .then(() => {
+        if (messages[0]?._id === message?._id) {
+        }
+      });
+  };
+  const deletedForEveryOne = (message: any, docid: any) => {
+    firestore()
+      .collection('chatrooms')
+      .doc(docid)
+      .collection('messages')
+      .doc(message?._id)
+      .update({...message, deletedForEveryOne: true})
+      .then(() => {
+        if (messages[0]?._id === message?._id) {
+        }
+      });
+  };
+
   useEffect(() => {
-    const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
     const subscribe = firestore()
       .collection('chatrooms')
       .doc(docid)
       .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(documentSnapshot => {
+        handleRead();
         const allmsg = documentSnapshot.docs.map(item => {
           return item.data();
         });
-        allmsg.sort((a, b) => {
-          return b.createdAt - a.createdAt;
+        allmsg.sort((a, b) => b.createdAt - a.createdAt);
+        let newmessages = allmsg.filter(item => {
+          if (item.deletedForEveryOne) return false;
+          else if (item.deleatedBy) return item.deleatedBy != useId;
+          else return true;
         });
-        //@ts-ignore
-        setMessages(allmsg);
+        setMessages(newmessages);
       });
     return subscribe;
   }, []);
@@ -50,39 +145,72 @@ export default function Chating({route}: {route: any}) {
       .collection('Users')
       .doc(UID)
       .onSnapshot((documentSnapshot: any) => {
-        console.log(documentSnapshot.data().isActive);
-        setuserStatus(documentSnapshot.data().isActive);
+        // console.log(documentSnapshot.data()?.isActive);
+        setuserStatus(documentSnapshot.data()?.isActive);
       });
     return subscribe;
   }, []);
-  const getAllmsg = async () => {
-    const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
-    const querySanp = await firestore()
-      .collection('chatrooms')
-      .doc(docid)
-      .collection('messages')
-      .orderBy('createdAt', 'desc')
-      .get();
-    const allmsg = querySanp.docs.map(docSanp => {
-      return docSanp.data();
-    });
-    //@ts-ignore
-    setMessages(allmsg);
-  };
 
   useEffect(() => {
-    getAllmsg();
+    firestore()
+      .collection('Users')
+      .doc(UserId)
+      .collection('inbox')
+      .onSnapshot((documentSnapshot: any) => {
+        let users = documentSnapshot?._docs?.map((item: any) => {
+          return item._data;
+        });
+        setData(users);
+      });
   }, []);
 
   const onSend = (messagesArray: any) => {
-    const msg = messagesArray[0];
-    messagesArray[0].createdAt = new Date().getTime();
+    let msg = messagesArray[0];
     const mymsg = {
       ...msg,
-      createdAt: new Date().getTime(),
+      fromUserID: UserId,
+      received: false,
+      sent: true,
+      toUserID: UID,
+      createdAt: new Date()?.getTime(),
     };
-    setMessages(previousMessages => GiftedChat.append(previousMessages, mymsg));
-    const docid = UID > UserId ? UserId + '-' + UID : UID + '-' + UserId;
+
+    if (messages.length == 0) {
+      firestore()
+        .collection('Users')
+        .doc(UserId)
+        .collection('inbox')
+        .doc(UID)
+        .set({
+          name: Name,
+          display: pic,
+          lastmessgae: mymsg,
+          uid: UID,
+        });
+
+      firestore()
+        .collection('Users')
+        .doc(UID)
+        .collection('inbox')
+        .doc(UserId)
+        .set({
+          name: loginname,
+          lastmessgae: mymsg,
+          display: User_Data?.display,
+          uid: UserId,
+        });
+    } else {
+      firestore()
+        .collection('Users')
+        .doc(UserId)
+        .collection('inbox')
+        .doc(UID)
+        .update({lastmessgae: mymsg});
+    }
+    setMessages((previousMessages: IMessage[] | undefined) =>
+      GiftedChat.append(previousMessages, mymsg),
+    );
+
     firestore()
       .collection('chatrooms')
       .doc(docid)
@@ -92,7 +220,7 @@ export default function Chating({route}: {route: any}) {
   };
   const renderSend = (props: any) => {
     return (
-      <Send {...props}>
+      <Send {...props} containerStyle={{marginBottom: 5, marginRight: 10}}>
         <View style={styles.viewsendiconimg}>
           <Image source={images.sendIcon} style={styles.sendiconimg} />
         </View>
@@ -143,17 +271,6 @@ export default function Chating({route}: {route: any}) {
       startTyping();
   };
 
-  const renderFooter = () => {
-    console.log('tfyhjbjm', getTypingStatus);
-if(getTypingStatus){
-  return (
-    <View style={{marginLeft:normalize(23)}}>
-<Spinner isVisible={true} type="ThreeBounce" size={60} color={'white'}/>
-    </View>   );
-}
-   
- 
-  };
   return (
     <View style={styles.parent}>
       <View style={styles.innerview}>
@@ -191,6 +308,7 @@ if(getTypingStatus){
       <View style={styles.line}></View>
       <ImageBackground style={styles.girlimg} source={images.peakpx}>
         <GiftedChat
+          onLongPress={handleLongPress}
           isTyping={getTypingStatus}
           onInputTextChanged={findtyping}
           messagesContainerStyle={{height: vh(540)}}
@@ -204,6 +322,7 @@ if(getTypingStatus){
             return (
               <Bubble
                 {...props}
+                tickStyle={{color: COLOR.BLACK}}
                 wrapperStyle={{
                   right: {
                     backgroundColor: COLOR.green,
@@ -217,10 +336,15 @@ if(getTypingStatus){
             );
           }}
           renderInputToolbar={props => (
-            <InputToolbar {...props} containerStyle={styles.containview} />
+            <InputToolbar
+              {...props}
+              containerStyle={styles.containview}
+              primaryStyle={{marginBottom: 0, height: 40, width: vw(350)}}
+            />
           )}
           renderSend={renderSend}
-          renderFooter={renderFooter}
+
+          // renderFooter={renderFooter}
         />
       </ImageBackground>
     </View>
@@ -314,6 +438,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     shadowColor: '#000',
+    marginBottom: 40,
   },
   userbackground: {
     height: normalize(40),

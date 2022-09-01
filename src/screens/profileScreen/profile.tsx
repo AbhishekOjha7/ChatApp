@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+
 import auth from '@react-native-firebase/auth';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -23,17 +25,18 @@ export default function ProfileScreen() {
   //   const usersCollectionRef = firestore().collection('Users');
   const dispatch = useDispatch();
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
-
+  const {User_Data} = useSelector((store: any) => store.chatReducer);
+  // console.log("uuuuu",User_Data);
+  
   const [name, setName] = useState<any>('');
   const [About, setAbout] = useState<any>('');
   const [Email, setEmail] = useState<any>('');
   const [coverimg, setCoverimg] = useState<any>();
   const navigation = useNavigation<any>();
-  // console.log('dddddd',name);
-  console.log('Adfcvfds',Auth_Data);
-  
-  
+  const [time, setTime] = useState(new Date().getTime());
 
+  const reference = storage().ref(`img_${time}.jpg`);
+  let uid = Auth_Data?.user?.user?.uid;
   const Logout = () => {
     auth()
       .signOut()
@@ -44,6 +47,20 @@ export default function ProfileScreen() {
       })
       .catch((err: any) => {
         console.log('err', err);
+      });
+  };
+  const imageUploadstore = (imagePath: any) => {
+    reference
+      .putFile(imagePath)
+      .then(response => {
+        reference.getDownloadURL().then(res => {
+          firestore().collection('Users').doc(uid).update({
+            profileImage: res,
+          });
+        });
+      })
+      .catch(err => {
+        console.log('error upload', err);
       });
   };
 
@@ -74,8 +91,14 @@ export default function ProfileScreen() {
         // isActive : true
       })
       .then(res => {
-        console.log('Response is', res);
-        dispatch({type: 'Set_Data', payload: res});
+        console.log('Response is--->');
+        dispatch({type: 'Set_Data', payload: {
+          name:name,
+          Email:Email,
+          About:About,
+          display:coverimg,
+          uid:uid
+        }});
         navigation.navigate('HomeScreen');
       })
       .catch(err => {
@@ -104,6 +127,7 @@ export default function ProfileScreen() {
         width: 100,
       });
       setCoverimg(image.path);
+      imageUploadstore(image.path)
     } catch (err) {
       console.log('ImageErr', err);
     }

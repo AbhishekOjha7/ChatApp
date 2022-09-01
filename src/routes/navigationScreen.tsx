@@ -11,72 +11,45 @@ import HomeScreen from '../screens/homeScreens';
 import Chating from '../screens/chat/messageScreen/chating';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
+import AllContact from '../screens/chat/messageScreen/allContact';
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
   const appState = useRef(AppState.currentState);
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   let UserId = Auth_Data?.user?.user?.uid;
-  console.log('AUTHHHHHH', Auth_Data);
-const [userStatus, setUserStatus] = useState('')
-  // useEffect(() => {
-  //   AppState.addEventListener('change', _handleAppStateChange);
-
-  //   return () => {
-  //     AppState.removeEventListener('change', _handleAppStateChange);
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  // console.log('AUTHHHHHH', Auth_Data);
+  const [userStatus, setUserStatus] = useState('');
 
   useEffect(() => {
     firestore().collection('Users').doc(UserId).update({
-      isActive:'online'
-    })
-    
+      isActive: 'online',
+    });
+
     const subscription = AppState.addEventListener('change', nextAppState => {
       if (
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
         firestore().collection('Users').doc(UserId).update({
-          isActive:'online'
-        })
-        
+          isActive: 'online',
+        });
+
         // status = true;
       } else {
         firestore().collection('Users').doc(UserId).update({
-          isActive:'offline'
-        })
+          isActive: 'offline',
+        });
       }
       appState.current = nextAppState;
       setUserStatus(appState.current);
       console.log('AppState', appState.current);
     });
-  
+
     return () => {
       subscription.remove();
     };
   }, []);
-
-  // const _handleAppStateChange = (nextAppState: any) => {
-  //   console.log('AppState', appState.current);
-  //   if (
-  //     appState.current.match(/inactive|background/) &&
-  //     nextAppState === 'active'
-  //   ) {
-  //     // TODO SET USERS ONLINE STATUS TO TRUE
-  //     firestore().collection('Users').doc(UserId).update({
-  //       isActive: true,
-  //     });
-  //   } else {
-  //     // TODO SET USERS ONLINE STATUS
-  //     firestore().collection('Users').doc(UserId).update({
-  //       isActive: false,
-  //     });
-  //   }
-
-  //   appState.current = nextAppState;
-  // };
 
   return (
     <NavigationContainer>
@@ -89,6 +62,7 @@ const [userStatus, setUserStatus] = useState('')
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="MessageScreen" component={MessageScreen} />
         <Stack.Screen name="Chating" component={Chating} />
+        <Stack.Screen name="AllContact" component={AllContact} />
       </Stack.Navigator>
     </NavigationContainer>
   );

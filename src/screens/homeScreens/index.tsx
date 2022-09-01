@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   menuTouchable: {
-    marginLeft: normalize(15),
+    marginLeft: normalize(9),
     borderColor: '#2f3d29',
     borderWidth: 2,
     borderRadius: normalize(10),
