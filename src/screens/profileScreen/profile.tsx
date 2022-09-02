@@ -8,6 +8,7 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  Platform,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
@@ -27,7 +28,7 @@ export default function ProfileScreen() {
   const {Auth_Data} = useSelector((store: any) => store.authReducer);
   const {User_Data} = useSelector((store: any) => store.chatReducer);
   // console.log("uuuuu",User_Data);
-  
+
   const [name, setName] = useState<any>('');
   const [About, setAbout] = useState<any>('');
   const [Email, setEmail] = useState<any>('');
@@ -92,13 +93,16 @@ export default function ProfileScreen() {
       })
       .then(res => {
         console.log('Response is--->');
-        dispatch({type: 'Set_Data', payload: {
-          name:name,
-          Email:Email,
-          About:About,
-          display:coverimg,
-          uid:uid
-        }});
+        dispatch({
+          type: 'Set_Data',
+          payload: {
+            name: name,
+            Email: Email,
+            About: About,
+            display: coverimg,
+            uid: uid,
+          },
+        });
         navigation.navigate('HomeScreen');
       })
       .catch(err => {
@@ -126,8 +130,12 @@ export default function ProfileScreen() {
         height: 150,
         width: 100,
       });
-      setCoverimg(image.path);
-      imageUploadstore(image.path)
+      Platform.OS === 'ios'
+        ? setCoverimg(image.sourceURL)
+        : setCoverimg(image.path);
+      console.log('yyy', image);
+
+      imageUploadstore(image.path);
     } catch (err) {
       console.log('ImageErr', err);
     }
@@ -203,7 +211,7 @@ const styles = StyleSheet.create({
   },
   headview: {
     flexDirection: 'row',
-    marginTop:60
+    marginTop: 60,
   },
   profiletxt: {
     color: COLOR.WHITE,

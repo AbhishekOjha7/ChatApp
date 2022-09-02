@@ -21,7 +21,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import {COLOR} from '../../../utils/color';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 export default function Chating({route}: {route: any}) {
   const navigation = useNavigation<any>();
   const {Name, UID, pic, status} = route.params;
@@ -132,7 +131,7 @@ export default function Chating({route}: {route: any}) {
         allmsg.sort((a, b) => b.createdAt - a.createdAt);
         let newmessages = allmsg.filter(item => {
           if (item.deletedForEveryOne) return false;
-          else if (item.deleatedBy) return item.deleatedBy != useId;
+          else if (item.deleatedBy) return item.deleatedBy != UserId;
           else return true;
         });
         setMessages(newmessages);
